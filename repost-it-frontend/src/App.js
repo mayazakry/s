@@ -67,6 +67,36 @@ function parseIntoSections(text) {
   return [{ id: 0, title: 'Your Bundle', content: (stripped || text).trim() }];
 }
 
+function ThreadItem({ part, index, total, platform }) {
+  const [copied, setCopied] = useState(false);
+  const clean = part.replace(/^\d+\/\d+\s*/, '').replace(/\*\*/g, '').trim();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(clean).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handlePost = () => {
+    window.open(PLATFORM_COMPOSE[platform](clean), '_blank', 'noopener');
+  };
+
+  return (
+    <div className="thread-item">
+      <div className="thread-item-top">
+        <span className="thread-num">{index + 1}/{total}</span>
+        <div className="thread-item-actions">
+          <button className="thread-act copy" onClick={handleCopy}>{copied ? '✓' : 'Copy'}</button>
+          <button className="thread-act post" onClick={handlePost}>Post</button>
+        </div>
+      </div>
+      <p className="thread-text">{clean}</p>
+    </div>
+  );
+}
+
+
 function PostCard({ post, persona, index }) {
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState('');
@@ -117,11 +147,9 @@ function PostCard({ post, persona, index }) {
         {isThread ? (
           <div className="thread-list">
             {threadParts.map((part, i) => (
-              <div key={i} className="thread-item">
-                <span className="thread-num">{i + 1}/{threadParts.length}</span>
-                <p className="thread-text">{part.replace(/^\d+\/\d+\s*/, '').trim()}</p>
-              </div>
+              <ThreadItem key={i} part={part} index={i} total={threadParts.length} platform={platform} />
             ))}
+            <p className="thread-hint">Post each part, then reply to yourself to continue the thread.</p>
           </div>
         ) : (
           <p className="post-text">{post.content.replace(/\*\*/g, '')}</p>
@@ -130,14 +158,16 @@ function PostCard({ post, persona, index }) {
 
       {toast && <div className="post-toast">{toast}</div>}
 
-      <div className="post-actions">
-        <button className="act-btn act-copy" onClick={handleCopy}>
-          {copied ? '✓ Copied!' : 'Copy Text'}
-        </button>
-        <button className="act-btn act-preview" onClick={handlePreview}>
-          {platform === 'instagram' ? 'Copy + Open Instagram' : `Preview on ${name}`}
-        </button>
-      </div>
+      {!isThread && (
+        <div className="post-actions">
+          <button className="act-btn act-copy" onClick={handleCopy}>
+            {copied ? '✓ Copied!' : 'Copy Text'}
+          </button>
+          <button className="act-btn act-preview" onClick={handlePreview}>
+            {platform === 'instagram' ? 'Copy + Open Instagram' : `Preview on ${name}`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

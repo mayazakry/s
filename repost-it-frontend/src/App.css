@@ -322,21 +322,59 @@ body {
 
 .thread-item {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: #0e0e16;
+  border: 1px solid #2a2a38;
+  border-radius: 10px;
+}
+
+.thread-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .thread-num {
-  flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #5050a0;
   background: #1e1e2e;
   border: 1px solid #2a2a38;
   border-radius: 6px;
   padding: 2px 7px;
-  margin-top: 2px;
   white-space: nowrap;
+}
+
+.thread-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.thread-act {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.thread-act:hover { opacity: 0.82; }
+
+.thread-act.copy {
+  background: rgba(124, 58, 237, 0.2);
+  color: #b29dfa;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.thread-act.post {
+  background: rgba(0, 0, 0, 0.5);
+  color: #a0a0c8;
+  border: 1px solid #333;
 }
 
 .thread-text {
@@ -345,6 +383,13 @@ body {
   color: #c8c8e8;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.thread-hint {
+  font-size: 0.72rem;
+  color: #4a4a70;
+  text-align: center;
+  padding-top: 4px;
 }
 
 /* ── Post action buttons ── */
