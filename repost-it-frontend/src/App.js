@@ -5,7 +5,7 @@ const PERSONAS = [
   { value: 'the-pro',      label: '💼 The Pro',     sub: 'LinkedIn-ready, polished' },
   { value: 'the-hustler',  label: '🔥 The Hustler',  sub: 'Sales energy, punchy' },
   { value: 'the-cook',     label: '🍳 The Cook',     sub: 'Facebook food seller' },
-  { value: 'the-creator',  label: '✨ The Creator',  sub: 'Twitter/X vibes, snappy' },
+  { value: 'the-creator',  label: '✨ The Creator',  sub: 'Twitter/X thread format' },
   { value: 'the-casual',   label: '😎 The Casual',   sub: 'Instagram, chill tone' },
 ];
 
@@ -93,11 +93,11 @@ function PostCard({ post, persona, index }) {
   const handlePreview = () => {
     const previewText = (isThread ? threadParts[0] || post.content : post.content).replace(/\*\*/g, '');
     if (platform === 'instagram') {
-      navigator.clipboard.writeText(previewText).then(() => {
-        setToast('Text copied — paste it in Instagram');
-        setTimeout(() => setToast(''), 3000);
-      });
-      window.open('https://www.instagram.com/', '_blank', 'noopener');
+      navigator.clipboard.writeText(previewText).catch(() => {});
+      setToast('✓ Text copied — paste it in Instagram');
+      // delay opening so the user sees the toast before the tab switches
+      setTimeout(() => window.open('https://www.instagram.com/', '_blank', 'noopener'), 900);
+      setTimeout(() => setToast(''), 4000);
     } else {
       window.open(PLATFORM_COMPOSE[platform](previewText), '_blank', 'noopener');
     }
