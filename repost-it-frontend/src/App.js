@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import './App.css';
 
 const PERSONAS = [
-  { value: 'the-pro', label: '💼 The Pro', sub: 'LinkedIn-ready, polished' },
-  { value: 'the-hustler', label: '🔥 The Hustler', sub: 'Sales energy, punchy' },
-  { value: 'the-creator', label: '✨ The Creator', sub: 'Twitter/X vibes, snappy' },
-  { value: 'the-casual', label: '😎 The Casual', sub: 'Instagram, chill tone' },
+  { value: 'the-pro',      label: '💼 The Pro',     sub: 'LinkedIn-ready, polished' },
+  { value: 'the-hustler',  label: '🔥 The Hustler',  sub: 'Sales energy, punchy' },
+  { value: 'the-cook',     label: '🍳 The Cook',     sub: 'Facebook food seller' },
+  { value: 'the-creator',  label: '✨ The Creator',  sub: 'Twitter/X vibes, snappy' },
+  { value: 'the-casual',   label: '😎 The Casual',   sub: 'Instagram, chill tone' },
 ];
 
 function App() {
