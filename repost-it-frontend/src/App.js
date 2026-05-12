@@ -9,25 +9,28 @@ const PERSONAS = [
   { value: 'the-casual',   label: '😎 The Casual',   sub: 'Instagram, chill tone' },
 ];
 
+// instagram has no compose URL — handlePreview copies text first then opens the app
 const PLATFORM_COMPOSE = {
   linkedin:  (text) => `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`,
   twitter:   (text) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+  threads:   (text) => `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
   facebook:  (text) => `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`,
   instagram: ()     => `https://www.instagram.com/`,
 };
 
 const PLATFORM_LABELS = {
-  linkedin: { badge: 'in', name: 'LinkedIn' },
-  twitter:  { badge: 'X',  name: 'X / Twitter' },
-  facebook: { badge: 'f',  name: 'Facebook' },
-  instagram:{ badge: '📸', name: 'Instagram' },
+  linkedin:  { badge: 'in', name: 'LinkedIn' },
+  twitter:   { badge: 'X',  name: 'X / Twitter' },
+  threads:   { badge: '@',  name: 'Threads' },
+  facebook:  { badge: 'f',  name: 'Facebook' },
+  instagram: { badge: '📸', name: 'Instagram' },
 };
 
 function guessPlatform(title, persona) {
   const t = (title || '').toLowerCase();
   const p = (persona || '').toLowerCase();
   if (t.includes('linkedin') || t.includes('professional') || p === 'the-pro') return 'linkedin';
-  if (t.includes('thread') || t.includes('twitter') || t.includes(' x ') || p === 'the-creator') return 'twitter';
+  if (t.includes('thread') || t.includes('twitter') || t.includes(' x ') || p === 'the-creator') return 'threads';
   if (t.includes('facebook') || t.includes('community') || p === 'the-cook') return 'facebook';
   if (t.includes('instagram') || t.includes('casual') || p === 'the-casual') return 'instagram';
   return 'twitter';
@@ -61,6 +64,7 @@ function parseIntoSections(text) {
 
 function PostCard({ post, persona, index }) {
   const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState('');
   const platform = guessPlatform(post.title, persona);
   const { badge, name } = PLATFORM_LABELS[platform];
 
@@ -82,9 +86,16 @@ function PostCard({ post, persona, index }) {
   };
 
   const handlePreview = () => {
-    const compose = PLATFORM_COMPOSE[platform];
-    const previewText = isThread ? threadParts[0] || post.content : post.content;
-    window.open(compose(previewText.replace(/\*\*/g, '')), '_blank', 'noopener');
+    const previewText = (isThread ? threadParts[0] || post.content : post.content).replace(/\*\*/g, '');
+    if (platform === 'instagram') {
+      navigator.clipboard.writeText(previewText).then(() => {
+        setToast('Text copied — paste it in Instagram');
+        setTimeout(() => setToast(''), 3000);
+      });
+      window.open('https://www.instagram.com/', '_blank', 'noopener');
+    } else {
+      window.open(PLATFORM_COMPOSE[platform](previewText), '_blank', 'noopener');
+    }
   };
 
   return (
@@ -112,12 +123,14 @@ function PostCard({ post, persona, index }) {
         )}
       </div>
 
+      {toast && <div className="post-toast">{toast}</div>}
+
       <div className="post-actions">
         <button className="act-btn act-copy" onClick={handleCopy}>
           {copied ? '✓ Copied!' : 'Copy Text'}
         </button>
         <button className="act-btn act-preview" onClick={handlePreview}>
-          Preview on {name}
+          {platform === 'instagram' ? 'Copy + Open Instagram' : `Preview on ${name}`}
         </button>
       </div>
     </div>

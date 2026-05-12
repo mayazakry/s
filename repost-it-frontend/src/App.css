@@ -281,8 +281,24 @@ body {
 
 .plat-linkedin  { background: #0a66c2; }
 .plat-twitter   { background: #000; border: 1px solid #333; }
+.plat-threads   { background: #000; border: 1px solid #333; font-size: 0.8rem; }
 .plat-facebook  { background: #1877f2; }
 .plat-instagram { background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af); font-size: 0.65rem; }
+
+/* ── Toast ── */
+.post-toast {
+  margin: 0 14px 0;
+  padding: 7px 12px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: #b29dfa;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
 /* ── Post body ── */
 .post-body {
