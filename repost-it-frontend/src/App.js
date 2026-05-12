@@ -37,29 +37,34 @@ function guessPlatform(title, persona) {
 }
 
 function parseIntoSections(text) {
-  // Split on bold headers like **Option 1: Title** or **Post 1: ...** at start of line
+  // Split on bold headers like **Option 1: Title** — drop any preamble intro that has no title
   const byOption = text.split(/(?=\n?\*\*(?:Option|Post|Version|Variation)\s+\d+[^*]*\*\*)/i).filter(s => s.trim());
 
   if (byOption.length > 1) {
-    return byOption.map((part, i) => {
-      const m = part.match(/^\*\*([^*]+)\*\*\n?([\s\S]*)/);
-      if (m) return { id: i, title: m[1].trim(), content: m[2].trim() };
-      return { id: i, title: `Post ${i + 1}`, content: part.trim() };
-    });
+    return byOption
+      .map((part, i) => {
+        const m = part.match(/^\*\*([^*]+)\*\*\n?([\s\S]*)/);
+        if (m) return { id: i, title: m[1].trim(), content: m[2].trim() };
+        return null; // skip preamble sections with no bold title
+      })
+      .filter(Boolean);
   }
 
   // Split on --- dividers
   const byDivider = text.split(/\n---+\n/).filter(s => s.trim());
   if (byDivider.length > 1) {
-    return byDivider.map((part, i) => {
-      const m = part.match(/^\*\*([^*]+)\*\*\n?([\s\S]*)/);
-      if (m) return { id: i, title: m[1].trim(), content: m[2].trim() };
-      return { id: i, title: `Post ${i + 1}`, content: part.trim() };
-    });
+    return byDivider
+      .map((part, i) => {
+        const m = part.match(/^\*\*([^*]+)\*\*\n?([\s\S]*)/);
+        if (m) return { id: i, title: m[1].trim(), content: m[2].trim() };
+        return null;
+      })
+      .filter(Boolean);
   }
 
-  // No clear sections — return as one card
-  return [{ id: 0, title: 'Your Bundle', content: text.trim() }];
+  // No clear sections — return as one card (strip leading intro line if present)
+  const stripped = text.replace(/^[^\n*]+\n\n/, '').trim();
+  return [{ id: 0, title: 'Your Bundle', content: (stripped || text).trim() }];
 }
 
 function PostCard({ post, persona, index }) {
@@ -68,13 +73,13 @@ function PostCard({ post, persona, index }) {
   const platform = guessPlatform(post.title, persona);
   const { badge, name } = PLATFORM_LABELS[platform];
 
-  // Detect thread: has "1/N" markers or "thread" in title
-  const isThread = /\b1\/\d+\b/.test(post.content) || /\bthread\b/i.test(post.title);
+  // Thread if: explicit 1/N notation, title says thread, or creator persona with multiple paragraphs
+  const paragraphs = post.content.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  const isThread = /\b1\/\d+\b/.test(post.content)
+    || /\bthread\b/i.test(post.title)
+    || (persona === 'the-creator' && paragraphs.length > 1);
 
-  // Split thread into parts on double-newline boundaries
-  const threadParts = isThread
-    ? post.content.split(/\n\n+/).filter(p => p.trim())
-    : [];
+  const threadParts = isThread ? paragraphs : [];
 
   const copyText = post.content;
 
